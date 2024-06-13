@@ -1,0 +1,68 @@
+Schema for table: `customersegment-p-1d26.customersegment_srv.lifecycle`:
+
+     column_name    
+0  customer_brand_id
+1         country_rk
+2     lifecycle_main
+3     lifecycle_core
+4  lifecycle_special
+
+Sample rows for table: `customersegment-p-1d26.customersegment_srv.lifecycle`:
+
+   customer_brand_id country_rk lifecycle_main lifecycle_core  \
+0      515828043         TR          SILENT         Tryer       
+1     2429332919         GB          SILENT         Tryer       
+2      325848311         JP        FREQUENT           Mid       
+
+  lifecycle_special  
+0          None      
+1          None      
+2       At risk      
+
+Schema for table: `customersegment-p-1d26.customersegment_srv.channel_preference`:
+
+        column_name       
+0        customer_brand_id
+1               country_rk
+2  channel_preference_desc
+
+Sample rows for table: `customersegment-p-1d26.customersegment_srv.channel_preference`:
+
+   customer_brand_id country_rk channel_preference_desc
+0     3211122010         JP             Pure Store     
+1     5347296073         US             Pure Store     
+2      516877882         TR            Pure Online     
+
+Schema for table: `customersegment-p-1d26.customersegment_trf.customer_sales_order_tmp`:
+
+        column_name     
+0      customer_brand_id
+1                    age
+2              gender_rk
+3    first_purchase_date
+4       sales_channel_rk
+5      online_order_code
+6             receipt_rk
+7             sales_date
+8             country_rk
+9        sales_no_of_pcs
+10   sales_net_price_fcc
+11  return_net_price_fcc
+
+Sample rows for table: `customersegment-p-1d26.customersegment_trf.customer_sales_order_tmp`:
+
+   customer_brand_id  age  gender_rk first_purchase_date  sales_channel_rk  \
+0      5341222425     29       1          2020-04-20              2          
+1       123883868     39       2          2021-01-23              1          
+2     53334323283     29       0          2024-01-22              1          
+
+  online_order_code         receipt_rk             sales_date     country_rk  \
+0     33361030233                online_order 2022-11-02 12:55:37     US       
+1     store_order    2022-07-02~4592~BE0241~5 2022-07-02 00:00:00     BE       
+2     store_order     2024-01-22~327~CA0050~1 2024-01-22 00:00:00     CA       
+
+  sales_no_of_pcs sales_net_price_fcc return_net_price_fcc  
+0    1.000000000       8.500000000            0E-9          
+1    1.000000000       1.990000000            0E-9          
+2    1.000000000       6.990000000            0E-9          
+
