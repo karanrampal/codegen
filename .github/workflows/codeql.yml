@@ -1,0 +1,28 @@
+name: Code vulnerability check
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  code_ql:
+    runs-on: ubuntu-latest
+
+    permissions:
+      actions: read # Gives permission to read actions.
+      contents: read # Gives permission to read your code.
+      security-events: write # Gives permission to create code scanning alerts.
+
+    steps:
+      - name: Checkout this repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Running CodeQL
+        id: run-code-vulnerability-scan
+        if: true # (optional, default: true ), false to skip the template or true to run it.
+        uses: hm-actions/run-code-vulnerability-scan@v1
