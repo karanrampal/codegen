@@ -1,0 +1,34 @@
+# System related
+build
+ipykernel
+ipywidgets
+gcsfs
+pyyaml
+types-pyyaml
+db-dtypes
+# Scipy stack
+numpy
+matplotlib
+pandas
+# GCP
+google-cloud-aiplatform
+google-cloud-bigquery
+google-cloud-secret-manager
+looker_sdk
+# UI
+gradio
+# Profiling
+ydata_profiling
+# Visualization
+autoviz
+# Others
+tqdm
+# Testing
+pytest
+pytest-cov
+pytest-mock
+# Formating, linting
+mypy
+pylint
+black
+isort

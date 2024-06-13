@@ -1,0 +1,62 @@
+[project]
+name = "codegen"
+dynamic = ["version"]
+authors = [
+  { name="Karan Rampal", email="karanrampal87@gmail.com" },
+]
+description = "A project for using LLM for SQL generation"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "pyyaml",
+    "numpy",
+    "matplotlib",
+    "pandas",
+    "google-cloud-aiplatform",
+    "google-cloud-bigquery",
+    "google-cloud-secret-manager",
+    "looker_sdk",
+    "db-dtypes",
+    "gradio",
+    "ydata_profiling",
+    "autoviz",
+    "tqdm"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/karanrampal/codegen"
+"Bug Tracker" = "https://github.com/karanrampal/codegen/issues"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+
+[tool.mypy]
+show_error_codes = true
+ignore_missing_imports = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+disable_error_code = ["attr-defined"]
+
+[tool.pylint."MASTER"]
+ignore = [".ipynb_checkpoints"]
+
+[tool.pylint."TYPECHECK"]
+generated-members = ["config_manager", "gradio"]
+
+[tool.isort]
+profile = "black"
+
+[tool.black]
+line-length = 100
