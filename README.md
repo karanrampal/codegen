@@ -5,6 +5,8 @@ I use google gemini-1.5-pro model to convert text to SQL code and then check for
 
 Streamlit is used for implementing the UI.
 
+![Home page](/assets/home.png "Home page")
+
 ## Install
 To install the libraries, create the virtual environment. I use conda but venv or any other is also fine. For conda, from project root dir, do the following,
 
