@@ -1,15 +1,22 @@
 name: CI pipeline
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
   pull_request:
     types: [opened, synchronize, reopened]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   style_check:
+    permissions:
+      contents: "read"
+      id-token: "write"
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -20,6 +27,13 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      - id: auth
+        name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          token_format: access_token
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.SERVICE_ACCOUNT }}
       - name: Install dependencies
         run: make install_ci
       - name: Format using Black, MyPy, iSort
@@ -28,8 +42,8 @@ jobs:
         run: make lint
       - name: Unit testing
         run: make test
-      - name: Sonarqube
-        uses: hm-actions/run-sonarqube-scan@v2
-        with:
-          sonar-token: ${{ secrets.SONAR_TOKEN }}
-          sonar-host-url: ${{ secrets.SONAR_HOST_URL }}
+      #- name: Sonarqube
+      #  uses: hm-actions/run-sonarqube-scan@v2
+      #  with:
+      #    sonar-token: ${{ secrets.SONAR_TOKEN }}
+      #    sonar-host-url: ${{ secrets.SONAR_HOST_URL }}
