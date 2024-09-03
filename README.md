@@ -1,9 +1,9 @@
 # Code generation
 Convert natural language text into SQL code which can be validated and executed in BigQuery.
 
-I use google gemini-pron model to convert text to SQL code and then check for some formatiing error using regular expressions. Once the generated query is checked it can be executed in Bigquery.
+I use google gemini-1.5-pro model to convert text to SQL code and then check for some formatiing error using regular expressions. Once the generated query is checked it can be executed in Bigquery.
 
-Gradio is used for implementing the UI.
+Streamlit is used for implementing the UI.
 
 ## Install
 To install the libraries, create the virtual environment. I use conda but venv or any other is also fine. For conda, from project root dir, do the following,
@@ -33,11 +33,11 @@ First authenticate to your GCP project by running, (assumes that you have config
 
 Ten to run the Gradio server locally run the following command from project root directory
 
-`./src/main.py --run-local`
+`streamlit run ./src/Home.py`
 
 This assumes that you have run `chmod +x main.py`. Else run,
 
-`python ./src/main.py --run-local`
+`python -m streamlit run ./src/Home.py`
 
 ## Deploy
 To deploy to cloud run first make sure you are authenticated into gcp,
