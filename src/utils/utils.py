@@ -1,42 +1,29 @@
 """Utility functions"""
 
-import shutil
-from glob import glob
+import io
+import logging
 from typing import Optional
 
 import pandas as pd
-from autoviz.AutoViz_Class import AutoViz_Class
-from PIL import Image
 
-from llm_manager.llm import LLMManager
-from prompt_manager.task_prompts import TaskPrompts
+from chat_manager.chatbot import ChatManager
 from query_formatter.formatter import QueryFormatter
 
 
 def get_proposed_query(
     question: str,
-    llm: LLMManager,
-    prompts: TaskPrompts,
+    sql_bot: ChatManager,
+    reflect_bot: ChatManager,
     use_reflection: bool = True,
-    **kwargs: str | int,
 ) -> str:
     """Query the LLM to generate SQL from natural language
 
     Args:
         question (str): The user's natural language query.
-        llm (LLMManager): LLM to be used for prompting
-        prompts (PromptManager): Taks prompt manager
+        sql_bot (ChatManager): LLM to be used for prompting
+        reflect_bot (ChatManager): LLM to be used for reflection
         use_reflection (bool): Whether to use the reflection pattern. If true, the LLM will be
             called a second time with the second prompt in the prompt_chain tuple.
-
-    Kwargs:
-        schemas_and_rows (str): A descriptive unstructured text of the schemas and top-n rows from
-            the tables.
-        cols_descriptions (str): An optional but recommended unstructured string that includes
-            column descriptions.
-        dataset_info (str): An optional but recommended unstructured string that includes additional
-            info about the data.
-        num_rows (int): The number of sample rows the model is being presented with.
 
     Returns:
         The SQL query proposed by the LLM
@@ -44,60 +31,52 @@ def get_proposed_query(
     if not question:
         return ""
 
-    sql_text_prompt = prompts.sql_prompt(
-        schemas_and_rows=kwargs["schemas_and_rows"],
-        col_descriptions=kwargs["cols_descriptions"],
-        additional_notes=kwargs["dataset_info"],
-        num_rows=kwargs["num_rows"],
-        question=question,
-    )
-
-    llm_response = llm.get_response(sql_text_prompt)
+    llm_response = sql_bot.get_chat_response(question)
+    if "```sql" not in llm_response and "```googlesql" not in llm_response:
+        return llm_response
     extracted_query = QueryFormatter.extract_sql(llm_response)
 
     if use_reflection:
-        reflect_llm_prompt = prompts.sql_reflection_prompt(
-            schemas_and_rows=kwargs["schemas_and_rows"],
-            additional_notes=kwargs["dataset_info"],
-            answer=extracted_query,
-            num_rows=kwargs["num_rows"],
-            question=question,
-        )
-
-        reflect_llm_response = llm.get_response(reflect_llm_prompt)
-        extracted_reflect_query = QueryFormatter.extract_sql(reflect_llm_response)
-
-        return extracted_reflect_query
+        tmp = f"##Question:\n{question}\n\n##SQL query:{extracted_query}"
+        reflect_llm_response = reflect_bot.get_chat_response(tmp)
+        extracted_query = QueryFormatter.extract_sql(reflect_llm_response)
 
     return extracted_query
 
 
-def merge_imgs(im1: Image.Image, im2: Image.Image) -> Image.Image:
-    """Merge two images vertically"""
-    h = im1.size[1] + im2.size[1]
-    w = max(im1.size[0], im2.size[0])
-    im = Image.new("RGBA", (w, h))
+def set_logger(log_path: Optional[str] = None) -> None:
+    """Set the logger to log info in terminal and file at log_path.
+    Args:
+        log_path: (string) location of log file
+    """
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
 
-    im.paste(im1)
-    im.paste(im2, (0, im1.size[1]))
+    if not logger.handlers:
+        stream_handler = logging.StreamHandler()
+        stream_handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s: %(message)s"))
+        logger.addHandler(stream_handler)
 
-    return im
+        if log_path:
+            file_handler = logging.FileHandler(log_path, mode="w")
+            file_handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s: %(message)s"))
+            logger.addHandler(file_handler)
 
 
-def autogen_viz(data: pd.DataFrame) -> Optional[list[str]]:
-    """Autogenerate visualizations"""
-    if data is None:
-        return None
-    row, col = data.shape
-    if row == 1 or col == 1:
-        return None
-    av_ = AutoViz_Class()
-    shutil.rmtree("./data/AutoViz/", ignore_errors=True)
-    try:
-        av_.AutoViz(filename="", dfte=data, chart_format="jpg", verbose=2, save_plot_dir="./data/")
-    except Exception as exc:  # pylint: disable=broad-except
-        print(f"Couldn't create plots, check input data! {exc}")
-    im_list = glob("./data/AutoViz/*.jpg")
-    if not im_list:
-        return None
-    return im_list
+def visualize(sbot: ChatManager, data: pd.DataFrame, response: Optional[str] = None) -> str:
+    """Visualize input dataframe"""
+    if not response:
+        buffer = io.StringIO()
+        data.info(memory_usage=False, buf=buffer)
+        tmp = buffer.getvalue()
+        ques = (
+            "Write python code to make an interactive plot for the dataframe `data` using plotly "
+            "express python package and save as html file called `result.html`. The dataframe has "
+            f"the following info,\n\n{tmp}"
+        )
+        response = sbot.get_chat_response(ques)
+    py_res = QueryFormatter.extract_python(response)
+    exec(py_res, {}, {"data": data})  # pylint: disable=exec-used
+    with open("result.html", "r", encoding="utf-8") as f:
+        html_data = f.read()
+    return html_data
