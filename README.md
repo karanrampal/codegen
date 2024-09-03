@@ -7,6 +7,14 @@ Streamlit is used for implementing the UI.
 
 ![Home page](/assets/home.png "Home page")
 
+The tool can be used by different personas as shown below,
+  - Business Analyst
+  ![Business Analyst](/assets/business_analyst.png "Business Analyst")
+  - Data Analyst
+  ![Data Analyst](/assets/data_analyst.png "Data Analyst")
+  - Data Catalogue
+  ![Data Catalogue](/assets/data_catalogue.png "Data Catalogue")
+
 ## Install
 To install the libraries, create the virtual environment. I use conda but venv or any other is also fine. For conda, from project root dir, do the following,
 
