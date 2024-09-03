@@ -1,7 +1,7 @@
 """Prompts for various tasks"""
 
 from datetime import date
-from textwrap import dedent
+from textwrap import dedent, indent
 
 
 class TaskPrompts:
@@ -14,11 +14,12 @@ class TaskPrompts:
         """Provide sql assistatn prompt
         Kwargs:
             schemas_and_rows (str): Schemas and row information
-            col_descriptions (str): Column descriptions
             additional_notes (str): Additional instructions to the LLM
             num_rows (int): Number of rows of input data
-            question (str): User question
         """
+        sar = indent(str(kwargs["schemas_and_rows"]), "        ")
+        notes = indent(str(kwargs["additional_notes"]), "        ")
+
         prompt = f"""
         ## Instruction
         You\'re an expert BigQuery data analyst.
@@ -34,19 +35,19 @@ class TaskPrompts:
 
         Take a deep breadth and think step-by-step. For complex queries, consider constructing inner SELECT statements to store intermediate results. 
 
-        ## Table schemas and sample rows
-        {kwargs["schemas_and_rows"]}
+        ## Table schemas and sample rows\n{sar}
 
-        ## Descriptions of the columns
-        {kwargs["col_descriptions"]}
+        ## Additional notes\n{notes}
 
-        ## Additional notes
-        {kwargs["additional_notes"]}
-
-        ## Question
-        {kwargs["question"]}
-
-        ## SQL query:
+        ## Examples
+        Question: What is the lifecycle count for 2023-01-01
+        Answer:
+        SELECT
+          count(*)
+        FROM
+          `customersegment-p-1d26.customersegment_srv.lifecycle_hst` AS t
+        WHERE
+          t.valid_from_date <= '2023-01-01' AND coalesce(t.valid_to_date, '9999-01-01') >= '2023-01-01'
         """
         return dedent(prompt)
 
@@ -55,10 +56,11 @@ class TaskPrompts:
         Kwargs:
             schemas_and_rows (str): Schema and row information
             additional_notes (str): Any additional instructions to the LLM
-            answer (str): Generated answer
             num_rows (int): Number of rows of input data
-            question (str): User question
         """
+        sar = indent(str(kwargs["schemas_and_rows"]), "        ")
+        notes = indent(str(kwargs["additional_notes"]), "        ")
+
         prompt = f"""
         ## Instruction
         You\'re an expert BigQuery data analyst.
@@ -72,19 +74,9 @@ class TaskPrompts:
         If there are any mistakes in the SQL query, you will explain what the mistakes are and you will think step by step on what would fix it. You will then generate the correct SQL query.
         If the query looks correct to you, you must simply answer with the exact same query by repeating it back.
 
-        ## Table schemas and sample rows
-        {kwargs["schemas_and_rows"]}
+        ## Table schemas and sample rows\n{sar}
 
-        ## Additional notes
-        {kwargs["additional_notes"]}
-
-        ## Question
-        {kwargs["question"]}
-
-        ## SQL query:
-        {kwargs["answer"]}
-
-        ## Your analysis:
+        ## Additional notes\n{notes}
         """
         return dedent(prompt)
 
@@ -95,17 +87,15 @@ class TaskPrompts:
             explore_details (str): Looker explore information
             dimensions (str): Looker dimension information
             measures (str): Looker measures information
-            inputs (str): User input
         """
         prompt = f"""
-        You're an analytics assistant and LookML expert.
+        You are an analytics assistant and LookML expert.
         Your goal is to translate natural language queries to a structured URL query in Looker that will get a visualization from a LookML Explore that answers the query or helps the user visualize what they're looking for.
         You will be given the LookML explores, dimensions, and measures. The URL query should be based on dimensions and measures.
         You will also be given some generic examples showing how to map a user query to a structured URL query
         You will be penalized for the following:
         - picking dimensions from different views when that is not necessary to produce the required result, as this would result in unnecessary joins and increased cost.
         - returning a response in JSON or in a format other than the structured URL query parameters format that you see in the examples
-        {kwargs["additional_instruction"]}
 
         <Explore>
         {kwargs["explore_details"]}
@@ -135,7 +125,7 @@ class TaskPrompts:
         input: What\'s the measure_1 by dimension_1 and dimension_2 as bar chart
         output: fields=dimension_1, dimension_2, measure_1&pivots=dimension_2&sorts=measure_1 asc&limit=500&column_limit=50&vis={{\"type\":\"looker_bar\"}}
 
-        input: What\'s the measure_1 by dimension_1, dimension_2  and dimension_3 as area chart
+        input: What\'s the measure_1 by dimension_1, dimension_2 and dimension_3 as area chart
         output: fields=dimension_1, dimension_2, dimension_3, measure_1&pivots=dimension_3&sorts=measure_1 asc&&vis={{\"type\":\"looker_area\"}}
 
         input: top 10 dimension_1 by measure_1 desc as table
@@ -153,19 +143,19 @@ class TaskPrompts:
         input: What\'s the measure_1 by dimension_1 and dimension_2 as bar chart this year
         output: fields=dimension_1, measure_1, measure_2&f[date_dimension]=this year&sorts=measure_1 desc&vis={{\"type\":\"looker_line\"}}
 
-        input: What\'s the measure_1 by dimension_1, dimension_2  and dimension_3 this week ?  as area
+        input: What\'s the measure_1 by dimension_1, dimension_2 and dimension_3 this week ? as area
         output: fields=dimension_1, dimension_2, measure_1&f[date_dimension]=this week&pivots=dimension_3&sorts=measure_1 desc&vis={{\"type\":\"looker_area\"}}
 
         input: What's the measure_1 for dimension_1 \'value\' for this week ?
         output: fields=measure_1&f[date_dimension]=this week&f[view.dimension_1]=value&sorts=measure_1 desc&vis={{\"type\":\"single_value\"}}
 
-        input: What's the measure_1 for dimension_1 \'value\'  and \' value_other\' for this week ?
+        input: What's the measure_1 for dimension_1 \'value\' and \' value_other\' for this week ?
         output: fields=measure_1&f[date_dimension]=this week&f[view.dimension_1]=value, value_other&sorts=measure_1 desc&vis={{\"type\":\"single_value\"}}
 
-        input: What's the measure_1 for dimension_1 \'value\'  and dimension_2 \'value_other\' for this week ?
+        input: What's the measure_1 for dimension_1 \'value\' and dimension_2 \'value_other\' for this week ?
         output: fields=measure_1&f[date_dimension]=this week&f[view.dimension_1]=value&f[view.dimension_2]=value_other&sorts=measure_1 desc&vis={{\"type\":\"looker_bar\"}}
 
-        input: What's the measure_1 for dimension_1 \'value\'  and measure_2 => 2 for last week ? as pie chart
+        input: What's the measure_1 for dimension_1 \'value\' and measure_2 => 2 for last week ? as pie chart
         output: fields=measure_1&f[date_dimension]=this week&f[view.dimension_1]=value&f[view.measure_2]=>=2&sorts=measure_1 desc&vis={{\"type\":\"looker_pie\"}}
 
         input: What's the measure_1 by date for the last 30 days ?
@@ -186,11 +176,8 @@ class TaskPrompts:
         input: measure_1 this month vs last month as bar
         output: fields=date_dimension,view.measure_1&f[date_dimension]=this month, last month&vis={{\"type\":\"looker_bar\"}}
 
-        input: measure_1  by dimension_1 today vs 7 days ago as bar chart
+        input: measure_1 by dimension_1 today vs 7 days ago as bar chart
         output: fields=date_dimension,measure_1,dimension_1&f[date_dimension]=today, 7 days ago&pivots=dimension_1&vis={{\"type\":\"looker_bar\"}}
         </Examples>
-
-        input: {kwargs["inputs"]}
-        output: 
         """
         return dedent(prompt)
