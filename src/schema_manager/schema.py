@@ -1,6 +1,5 @@
 """Generate and manage schema"""
 
-import csv
 import os
 
 from google.cloud import bigquery
@@ -33,26 +32,34 @@ class SchemaManager:
         """Gets a string listing results from n randomly selected rows from the given table"""
         col_names = ", ".join(cols)
         intro_str = f"Sample rows for table: `{table}`:\n\n"
-        query_str = f"SELECT {col_names} FROM `{table}` ORDER BY RAND() LIMIT {n};"
+        query_str = f"SELECT {col_names} FROM `{table}` #PARTION_FILTER# ORDER BY RAND() LIMIT {n};"
+        query_str = (
+            query_str.replace(
+                "#PARTION_FILTER#", "WHERE session_date > DATE_TRUNC(CURRENT_DATE(), MONTH)"
+            )
+            if "onlinebehaviour" in table
+            else query_str.replace("#PARTION_FILTER#", "")
+        )
         tmp = self.client.query(query_str).result().to_dataframe()
-        return intro_str + str(tmp) + "\n\n"
+        return intro_str + tmp.to_markdown(index=False) + "\n\n"
 
     def extract_schemas(self) -> None:
         """Extract schemas of the tables by reading from the tables"""
+        self.schemas = ""
         for table in self.table_names:
             table_split = table.split(".")
             querystring = f"""
             SELECT
-            column_name,
+            column_name, data_type, description
             FROM
-            `{".".join(table_split[:-1])}`.INFORMATION_SCHEMA.COLUMNS
+            `{".".join(table_split[:-1])}`.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS
             WHERE
-            table_name = '{table_split[-1]}';
+            table_name = "{table_split[-1]}";
             """
             self.schemas += f"Schema for table: `{table}`:\n\n"
             tmp = self.client.query(querystring).result().to_dataframe()
             tmp = tmp[~tmp["column_name"].isin(self.filter_cols)].reset_index(drop=True)
-            self.schemas += str(tmp) + "\n\n"
+            self.schemas += tmp.to_markdown(index=False) + "\n\n"
             self.schemas += self.get_n_rows_as_string(
                 table, tmp.column_name.tolist(), self.num_rows
             )
@@ -72,17 +79,6 @@ class SchemaManager:
         path_ = os.path.join(self.meta_loc, "schemas.txt")
         with open(path_, "w", encoding="utf-8") as s:
             s.write(self.schemas)
-
-    def get_column_descriptions(self) -> str:
-        """Get column descriptions for dataset"""
-        path_ = os.path.join(self.meta_loc, "columns_descriptions.csv")
-        output_str = ""
-        with open(path_, "r", newline="", encoding="UTF-8") as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                output_str += f"{row['name']}: {row['description']}\n"
-
-        return output_str
 
     def get_dataset_info(self) -> str:
         """Get additional info about dataset"""
