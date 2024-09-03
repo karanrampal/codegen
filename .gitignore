@@ -32,6 +32,9 @@ __pypackages__/
 # VScode
 .vscode/
 
+# Streamlit
+.streamlit/
+
 # Project specific
 data/
 output/
