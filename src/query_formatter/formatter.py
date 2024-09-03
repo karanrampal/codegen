@@ -36,12 +36,12 @@ class QueryFormatter:
         if not query:
             return ""
 
-        missing_list = re.findall(r"`?customersegment[-\w.]+`?", query)
+        missing_list = re.findall(r"`?(?:customersegment|onlinebehaviour)[-\w.]+`?", query)
         missing = set(missing_list)
         for mis in missing:
             if "`" not in mis:
                 query = query.replace(mis, "`" + mis + "`")
-        return query
+        return query.replace("``", "`")
 
     @classmethod
     def format_underscore(cls, query: str) -> str:
@@ -49,6 +49,7 @@ class QueryFormatter:
         if not query:
             return ""
         query = query.replace("customersegment_p_1d26", "customersegment-p-1d26")
+        query = query.replace("onlinebehaviour_p_e4a2", "onlinebehaviour-p-e4a2")
         return query
 
     @classmethod
@@ -104,3 +105,13 @@ class QueryFormatter:
         url = f"{looker_explore_base_url}{query_url_fmt}&toggle=dat,pik,vis&allow_login_screen=true"
 
         return url
+
+    @classmethod
+    def extract_python(cls, query: str) -> str:
+        """Extract the python code delimited by triple backticks"""
+        match = re.search(r"```python(.*?)``", query, re.DOTALL)
+
+        if match:
+            extracted = match.group(1)
+            return extracted
+        return ""
