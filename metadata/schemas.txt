@@ -1,68 +1,95 @@
-Schema for table: `customersegment-p-1d26.customersegment_srv.lifecycle`:
+Schema for table: `customersegment-p-1d26.customersegment_srv.lifecycle_hst`:
 
-     column_name    
-0  customer_brand_id
-1         country_rk
-2     lifecycle_main
-3     lifecycle_core
-4  lifecycle_special
+| column_name         | data_type   | description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+|:--------------------|:------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| customer_brand_id   | INT64       | Customer brand identifier                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| business_partner_id | INT64       | Business partner identifier                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| country_rk          | STRING      | Country identifier                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| first_purchase_date | DATE        | The date on which customer made the first ever purchase (store or online)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| last_purchase_date  | DATE        | The date on which customer made the latest purchase (store or online)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| lifecycle_main      | STRING      | The main stages of the customer Life Cycle: Tryer : The customer is a new customer that have bought one or two times in the past 12 months Frequent: All customers in this stage has made at least one purchase in the past 12 months Silent: If a customer has not made any purchase in the last 12 months but has made transaction in the past 12-24 months Lost : The customer is the lost stage when the customer has not made any transaction in last 24 months                                                                                                                                                                                                                                                                                 |
+| lifecycle_core      | STRING      | The core stages of the Lifecycle adds more information to the main stages: Tryer 1st: customer is in tryer stage and made 1 transaction in the past 12 months Tryer 2nd: Customer in the tryer stage and made 2 transactions in the past 12 months Frequent Low: customer in the frequent stage who has made 1 to 5 transactions in the past 12 months Frequent Mid: customer in the frequent stage who has made 6 to 11 transactions in the past 12 months Frequent High:customer in the frequent stage who has made 12 or more transactions in the past 12 months Silent High, Silent Mid, Silent Low, Silent Tryer: The customer is currently in the Silent stage and core represents the highest core state when it was in the frequent or tryer |
+| lifecycle_special   | STRING      | Indicates if the customer has a declining shopping tendency that deviates from their expected behavior. This applies only for Frequent and Tryer 1 customers                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| valid_from_date     | DATE        | Start date for the record                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| valid_to_date       | DATE        | End data ot record                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 
-Sample rows for table: `customersegment-p-1d26.customersegment_srv.lifecycle`:
+Sample rows for table: `customersegment-p-1d26.customersegment_srv.lifecycle_hst`:
 
-   customer_brand_id country_rk lifecycle_main lifecycle_core  \
-0      515828043         TR          SILENT         Tryer       
-1     2429332919         GB          SILENT         Tryer       
-2      325848311         JP        FREQUENT           Mid       
-
-  lifecycle_special  
-0          None      
-1          None      
-2       At risk      
+|   customer_brand_id |   business_partner_id | country_rk   | first_purchase_date   | last_purchase_date   | lifecycle_main   | lifecycle_core   | lifecycle_special   | valid_from_date   | valid_to_date   |
+|--------------------:|----------------------:|:-------------|:----------------------|:---------------------|:-----------------|:-----------------|:--------------------|:------------------|:----------------|
+|             3260754 |            1103131019 | JP           | 2016-05-02            | 2021-09-12           | FREQUENT         | Mid              |                     | 2021-09-26        | 2021-10-02      |
+|           536574197 |            1017232408 | US           | 2016-01-31            | 2023-03-23           | FREQUENT         | Low              |                     | 2023-07-16        | 2023-07-22      |
+|           101192784 |             100271755 | AT           | 2014-11-01            | 2023-10-12           | FREQUENT         | High             |                     | 2023-10-15        | 2023-10-21      |
 
 Schema for table: `customersegment-p-1d26.customersegment_srv.channel_preference`:
 
-        column_name       
-0        customer_brand_id
-1               country_rk
-2  channel_preference_desc
+| column_name             | data_type   | description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+|:------------------------|:------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| customer_brand_id       | INT64       | Customer brand identifier                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| business_partner_id     | INT64       | Business partner identifier                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| country_rk              | STRING      | Country identifier                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| channel_preference_desc | STRING      | Customer's preferred transaction channel in the past 12 months. For customers that have not made any tranaction last 12, the preference is estimated on the purchases made the last 24 months. The preferred channel is described here. Multichannel with online propensity - proportion of online transactions > 70% Multichannel with store propensity - proportion of online transactions < 30% Multichannel with equal propensity -proportion of online transactions between 30% and 70% Pure Store - All transactions are in store Pure Online - All transactions are online |
+| valid_from_date         | DATE        | Start date for the record                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| valid_to_date           | DATE        | End data ot record                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 
 Sample rows for table: `customersegment-p-1d26.customersegment_srv.channel_preference`:
 
-   customer_brand_id country_rk channel_preference_desc
-0     3211122010         JP             Pure Store     
-1     5347296073         US             Pure Store     
-2      516877882         TR            Pure Online     
+|   customer_brand_id |   business_partner_id | country_rk   | channel_preference_desc   | valid_from_date   | valid_to_date   |
+|--------------------:|----------------------:|:-------------|:--------------------------|:------------------|:----------------|
+|         53109259367 |            3163332807 | US           | Pure Store                | 2024-05-19        | NaT             |
+|           303419160 |            3062461804 | IN           | Pure Online               | 2022-10-02        | NaT             |
+|          2438645399 |            3121878950 | GB           | Pure Store                | 2024-06-30        | NaT             |
 
 Schema for table: `customersegment-p-1d26.customersegment_trf.customer_sales_order_tmp`:
 
-        column_name     
-0      customer_brand_id
-1                    age
-2              gender_rk
-3    first_purchase_date
-4       sales_channel_rk
-5      online_order_code
-6             receipt_rk
-7             sales_date
-8             country_rk
-9        sales_no_of_pcs
-10   sales_net_price_fcc
-11  return_net_price_fcc
+| column_name          | data_type   | description                                                                                                                       |
+|:---------------------|:------------|:----------------------------------------------------------------------------------------------------------------------------------|
+| customer_brand_id    | INT64       | Unique id for a customer for brand and country based on email Address                                                             |
+| business_partner_id  | INT64       | Business partner ID assigned by main system (CRM or Customer API)                                                                 |
+| age                  | INT64       | Age derived in years from the DoB and day of customer account base updation                                                       |
+| gender_rk            | INT64       | Gender info given by the customer account. Values [0: UNKNOWN, 1: FEMALE/WOMEN, 2: MALE/MEN, 3: PREFER NOT TO SAY, 4: NON-BINARY] |
+| first_purchase_date  | DATE        | The date on which customer account made the first purchase either online or store                                                 |
+| sales_channel_rk     | INT64       | The sales channel values [1: is store, 2: online]                                                                                 |
+| online_order_code    | STRING      | Customer Order, example: 25485746606                                                                                              |
+| receipt_rk           | STRING      | Receipt identifier                                                                                                                |
+| sales_date           | DATETIME    | Date of the transaction                                                                                                           |
+| country_rk           | STRING      | country code                                                                                                                      |
+| sales_no_of_pcs      | NUMERIC     | number of pieces of the article sold                                                                                              |
+| sales_net_price_fcc  | NUMERIC     | net sales price of the article. Net price is after reduction, discount and promotions                                             |
+| return_net_price_fcc | NUMERIC     | return net price for the article - net price is after reduction, discount and  promtion                                           |
 
 Sample rows for table: `customersegment-p-1d26.customersegment_trf.customer_sales_order_tmp`:
 
-   customer_brand_id  age  gender_rk first_purchase_date  sales_channel_rk  \
-0      5341222425     29       1          2020-04-20              2          
-1       123883868     39       2          2021-01-23              1          
-2     53334323283     29       0          2024-01-22              1          
+|   customer_brand_id |   business_partner_id |   age |   gender_rk | first_purchase_date   |   sales_channel_rk |   online_order_code | receipt_rk   | sales_date          | country_rk   |   sales_no_of_pcs |   sales_net_price_fcc |   return_net_price_fcc |
+|--------------------:|----------------------:|------:|------------:|:----------------------|-------------------:|--------------------:|:-------------|:--------------------|:-------------|------------------:|----------------------:|-----------------------:|
+|           369322401 |            1004599355 |    34 |           1 | 2011-01-30            |                  2 |         51836620946 | online_order | 2023-04-16 23:24:01 | NL           |                 0 |                  0    |                     16 |
+|           407345988 |            1130163362 |    33 |           1 | 2018-01-23            |                  2 |         61082708201 | online_order | 2024-06-27 19:10:12 | CH           |                 1 |                  7.61 |                      0 |
+|            62251349 |            3003208261 |    34 |           1 | 2019-02-19            |                  2 |         48684139021 | online_order | 2022-12-28 21:29:46 | CH           |                 1 |                  5.95 |                      0 |
 
-  online_order_code         receipt_rk             sales_date     country_rk  \
-0     33361030233                online_order 2022-11-02 12:55:37     US       
-1     store_order    2022-07-02~4592~BE0241~5 2022-07-02 00:00:00     BE       
-2     store_order     2024-01-22~327~CA0050~1 2024-01-22 00:00:00     CA       
+Schema for table: `onlinebehaviour-p-e4a2.onlinebehaviour_srv.session`:
 
-  sales_no_of_pcs sales_net_price_fcc return_net_price_fcc  
-0    1.000000000       8.500000000            0E-9          
-1    1.000000000       1.990000000            0E-9          
-2    1.000000000       6.990000000            0E-9          
+| column_name                    | data_type   | description                                                                                                                                                                                                                                               |
+|:-------------------------------|:------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| session_id                     | STRING      | **Part of Business Key**. Unique ID for a session. Session ID for maintaining session in realtime subscriptions.                                                                                                                                          |
+| market_country_rk              | STRING      | **Part of Business Key**. 2 letter code for the selected market for the site. Eg. 'BE'. Converted to uppercase. It is the reference key to country table.                                                                                                 |
+| session_date                   | DATE        | **Partition_Key**. Date (in UTC timezone) when the 1st event for the session was received by the server. 'yyyy-mm-dd' formatted.                                                                                                                          |
+| user_id                        | STRING      | Unique ID for identified customers. It contains BPID if available for the market. Usually, since white label markets are not using the our backend we don't have BPID for white label markets, but we should have some other identifier for the customer. |
+| touchpoint                     | STRING      | The touchpoint where the user gets engaged. Eg. desktop, mobile, tablet, ios, android, mobileapp. Converted to lowercase.                                                                                                                                 |
+| device_type                    | STRING      | The type of the device. Eg. mobile, tablet etc. Converted to lowercase.                                                                                                                                                                                   |
+| first_event                    | STRING      | The name of the first event.                                                                                                                                                                                                                              |
+| last_event                     | STRING      | The name of the last event.                                                                                                                                                                                                                               |
+| time_spent_mins                | NUMERIC     | Total time spent in minutes.                                                                                                                                                                                                                              |
+| page_view_event_count          | INT64       | Total number of page_view events occurred.                                                                                                                                                                                                                |
+| is_member_signup_completed     | BOOL        | True if any member_signup_completed event exists, otherwise false.                                                                                                                                                                                        |
+| is_newsletter_signup_completed | BOOL        | True if any newsletter_signup_completed event exists, otherwise false.                                                                                                                                                                                    |
+| is_search                      | BOOL        | True if at least one search_result event, otherwise false.                                                                                                                                                                                                |
+| dep_revenue_transaction_count  | INT64       | Total number of 'purchase' events occurred.                                                                                                                                                                                                               |
+
+Sample rows for table: `onlinebehaviour-p-e4a2.onlinebehaviour_srv.session`:
+
+| session_id                       | market_country_rk   | session_date   |    user_id | touchpoint   | device_type   | first_event      | last_event        |   time_spent_mins |   page_view_event_count | is_member_signup_completed   | is_newsletter_signup_completed   | is_search   |   dep_revenue_transaction_count |
+|:---------------------------------|:--------------------|:---------------|-----------:|:-------------|:--------------|:-----------------|:------------------|------------------:|------------------------:|:-----------------------------|:---------------------------------|:------------|--------------------------------:|
+| s_4039842570105978.1720537694606 | ES                  | 2024-07-09     |            | mobile       | mobile        | experiment_start | product_list_view |              2.3  |                       7 | False                        | False                            | False       |                               0 |
+| s_8552501573517601.1721202873622 | DE                  | 2024-07-17     | 1139038208 | mobile       | mobile        | promotion_view   | product_list_view |             13.47 |                      40 | False                        | False                            | False       |                               0 |
+| s_6096111536035678.1720178089180 | IT                  | 2024-07-05     | 1113753790 | ios          | mobile        | app_start        | page_view         |              0    |                       2 | False                        | False                            | False       |                               0 |
 
